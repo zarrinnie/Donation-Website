@@ -1,0 +1,132 @@
+@import 'tailwindcss';
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Poppins', 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Grace Community Church palette (extracted from reference mockups) */
+    --color-mint-50: #ecf9f1;
+    --color-mint-100: #d4f0e0;
+    --color-mint-300: #8fd9b6;
+    --color-mint-400: #6fcf97;
+    --color-mint-500: #52b788;
+    --color-mint-600: #3f9e73;
+    --color-mint-700: #2f7d5b;
+    --color-slate-card: #1e293b;
+}
+
+
+
+/**
+    The lines above are intact.
+    The lines below were added by maryUI installer.
+*/
+
+/** daisyUI */
+@plugin "daisyui" {
+    themes: light --default, dark --prefersdark;
+}
+
+:root {
+    /* Drive every daisyUI/Mary "primary" element with the signature mint */
+    --color-primary: #52b788;
+    --primary: #52b788;
+    --color-primary-content: #ffffff;
+    --primary-content: #ffffff;
+    --color-success: #2f9e6b;
+    --success: #2f9e6b;
+    --color-success-content: #ffffff;
+}
+
+/* maryUI */
+@source "../../vendor/robsontenorio/mary/src/View/Components/**/*.php";
+
+/* Theme toggle */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/**
+* Paginator - Traditional style
+* Because Laravel defaults does not match well the design of daisyUI.
+*/
+
+.mary-table-pagination span[aria-current="page"] > span {
+    @apply bg-primary text-base-100
+}
+
+.mary-table-pagination button {
+    @apply cursor-pointer
+}
+
+/* =====================================================================
+   Grace Community Church — design-system utilities
+   (extracted from the three reference mockups)
+   ===================================================================== */
+
+/* Mint/seafoam hero gradient (reference #1) */
+.hero-mint {
+    background: linear-gradient(135deg, #a7e3c4 0%, #7fd3a6 45%, #52b788 100%);
+}
+
+.text-mint {
+    color: #52b788;
+}
+
+/* Solid dark contrast section (reference #2) */
+.section-dark {
+    background: #0b0b0b;
+    color: #f5f5f5;
+}
+
+/* Deep teal -> black footer gradient (reference #3) */
+.footer-teal {
+    background: linear-gradient(180deg, #4aa882 0%, #1f5f4a 45%, #050807 100%);
+}
+
+/* Soft overlapping white card — the "Total Donated" card (reference #1) */
+.card-soft {
+    background: #ffffff;
+    border-radius: 1.25rem;
+    box-shadow: 0 24px 50px -24px rgba(16, 40, 32, 0.45);
+}
+
+/* Pill-shaped primary button */
+.btn-pill {
+    border-radius: 9999px;
+}
+
+/* Dark slate/navy form card with white inputs (reference #3) */
+.form-card {
+    background: #1e293b;
+    border-radius: 1.5rem;
+    color: #ffffff;
+}
+
+/* SQUARE donation option tile (specific override from the brief).
+   Dark slate when inactive, mint when active/selected. */
+.donate-tile {
+    @apply relative flex aspect-square w-full cursor-pointer select-none flex-col items-center justify-center gap-1 rounded-2xl border-2 border-transparent p-4 text-center font-semibold transition;
+    background: #1e293b;
+    color: #ffffff;
+}
+
+.donate-tile:hover {
+    border-color: #475569;
+}
+
+.donate-tile.is-active {
+    background: #52b788;
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 0 0 3px rgba(143, 217, 182, 0.55);
+}
+
+.donate-tile .tile-title {
+    @apply text-xl font-bold;
+}
+
+.donate-tile .tile-sub {
+    @apply text-xs font-medium opacity-80;
+}
