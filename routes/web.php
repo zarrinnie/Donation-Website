@@ -1,25 +1,27 @@
 <?php
 
-use App\Livewire\Admin\Dashboard as AdminDashboard;
+use App\Http\Controllers\DokuWebhookController;
 // Auth Routes
+use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\Donation\Index as AdminDonationIndex;
 use App\Livewire\Admin\DonationSetting\Index as AdminDonationSettingIndex;
 use App\Livewire\Admin\Donor\Index as AdminDonorIndex;
-use App\Livewire\Admin\GlobalSearch;
 // Email Verification Routes
-use App\Livewire\Admin\User\Index as AdminUserIndex;
+use App\Livewire\Admin\GlobalSearch;
 // Route khusus untuk handle klik link dari email (Laravel Handle Otomatis)
-use App\Livewire\Auth\ForgotPassword;
+use App\Livewire\Admin\User\Index as AdminUserIndex;
 // Public Routes
+use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Auth\VerifyEmail;
-use App\Livewire\Public\About;
 // Admin Routes
+use App\Livewire\Public\About;
 use App\Livewire\Public\Donate;
 use App\Livewire\Public\Landing;
 use App\Livewire\Public\Payment;
+use App\Livewire\Public\SubscriptionReview;
 use App\Livewire\Public\ThankYou;
 use App\Livewire\User\Dashboard as UserDashboard;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -31,7 +33,21 @@ Route::get('/', Landing::class)->name('home');
 Route::get('/about', About::class)->name('about');
 Route::get('/donate', Donate::class)->name('donate');
 Route::get('/donate/payment', Payment::class)->name('donate.payment');
-Route::get('/donate/thank-you', ThankYou::class)->name('donate.thank-you');
+
+// Signed: this is the DOKU success/failure redirect target and the link
+// carried in the confirmation email, so it must not be guessable/tamperable.
+Route::get('/donate/thank-you/{donation:reference}', ThankYou::class)
+    ->middleware('signed')->name('donate.thank-you');
+
+// Signed: reached only via the monthly renewal reminder email.
+Route::get('/donate/subscription/{subscription}/review', SubscriptionReview::class)
+    ->middleware('signed')->name('donate.subscription.review');
+
+// Server-to-server DOKU payment notification — no session/CSRF (see
+// bootstrap/app.php's validateCsrfTokens except-list), verified via HMAC
+// signature inside the controller itself.
+Route::post('/webhooks/doku/notification', DokuWebhookController::class)
+    ->name('webhooks.doku.notification');
 
 // Route khusus untuk halaman "Please Verify"
 Route::get('/email/verify', VerifyEmail::class)

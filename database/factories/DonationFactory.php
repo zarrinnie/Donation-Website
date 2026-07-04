@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Donation;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Donation>
@@ -29,14 +28,14 @@ class DonationFactory extends Factory
             'donor_age' => fake()->numberBetween(18, 75),
             'donor_email' => fake()->unique()->safeEmail(),
             'donor_phone' => fake()->numerify('+1 (###) ###-####'),
-            'amount' => fake()->randomElement([25, 50, 100, 150, 250]),
+            'amount' => fake()->randomElement([25000, 50000, 100000, 150000, 250000]),
             'time_range_label' => $range[0],
             'time_range_days' => $range[1],
             'is_custom_amount' => false,
             'is_custom_range' => false,
             'status' => fake()->randomElement(Donation::STATUSES),
             'payment_method' => 'card',
-            'reference' => 'GCC-'.strtoupper(Str::random(10)),
+            'reference' => Donation::generateReference(),
         ];
     }
 

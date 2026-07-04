@@ -32,57 +32,33 @@
                 <div class="border-t border-slate-200 pt-4 flex justify-between items-center">
                     <dt class="text-slate-500">Total</dt>
                     <dd class="text-3xl font-extrabold text-mint">
-                        ${{ number_format((float) ($intent['amount'] ?? 0), 2) }}
+                        Rp {{ number_format((float) ($intent['amount'] ?? 0), 0, ',', '.') }}
                     </dd>
                 </div>
             </dl>
         </div>
 
-        {{-- Mock gateway --}}
-        <div class="lg:col-span-3 form-card p-8 lg:p-10">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold">Payment Details</h2>
-                <span class="text-xs px-3 py-1 rounded-full bg-white/10 text-white/70">🔒 Mock Gateway</span>
+        {{-- DOKU checkout --}}
+        <div class="lg:col-span-3 form-card p-8 lg:p-10 flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold">Secure Payment</h2>
+                    <span class="text-xs px-3 py-1 rounded-full bg-white/10 text-white/70">🔒 Powered by DOKU</span>
+                </div>
+                <p class="text-white/70 text-sm mb-8">
+                    You'll be redirected to DOKU's secure checkout page to complete your payment.
+                    Nothing is charged until you finish there.
+                </p>
             </div>
 
-            <form wire:submit="pay" class="space-y-5">
-                <div>
-                    <label class="block mb-2 font-medium">Name on Card</label>
-                    <input type="text" wire:model="card_name" placeholder="Jane Doe"
-                        class="w-full rounded-xl px-4 py-3 bg-white text-slate-800 placeholder-slate-400 focus:outline-none">
-                    @error('card_name') <span class="text-red-300 text-sm">{{ $message }}</span> @enderror
-                </div>
-                <div>
-                    <label class="block mb-2 font-medium">Card Number</label>
-                    <input type="text" wire:model="card_number" placeholder="4242 4242 4242 4242"
-                        class="w-full rounded-xl px-4 py-3 bg-white text-slate-800 placeholder-slate-400 focus:outline-none">
-                    @error('card_number') <span class="text-red-300 text-sm">{{ $message }}</span> @enderror
-                </div>
-                <div class="grid grid-cols-2 gap-5">
-                    <div>
-                        <label class="block mb-2 font-medium">Expiry</label>
-                        <input type="text" wire:model="card_expiry" placeholder="MM/YY"
-                            class="w-full rounded-xl px-4 py-3 bg-white text-slate-800 placeholder-slate-400 focus:outline-none">
-                        @error('card_expiry') <span class="text-red-300 text-sm">{{ $message }}</span> @enderror
-                    </div>
-                    <div>
-                        <label class="block mb-2 font-medium">CVC</label>
-                        <input type="text" wire:model="card_cvc" placeholder="123"
-                            class="w-full rounded-xl px-4 py-3 bg-white text-slate-800 placeholder-slate-400 focus:outline-none">
-                        @error('card_cvc') <span class="text-red-300 text-sm">{{ $message }}</span> @enderror
-                    </div>
-                </div>
-
-                <button type="submit"
-                    class="w-full rounded-xl py-4 font-semibold text-white text-lg transition mt-2"
-                    style="background-color:#52b788;" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="pay">Donate ${{ number_format((float) ($intent['amount'] ?? 0), 2) }}</span>
-                    <span wire:loading wire:target="pay">Processing…</span>
-                </button>
+            <div class="space-y-5">
+                <x-button label="Pay Rp {{ number_format((float) ($intent['amount'] ?? 0), 0, ',', '.') }}"
+                    wire:click="pay" spinner="pay"
+                    class="w-full rounded-xl py-4 font-semibold text-white text-lg btn-primary" />
 
                 <a href="{{ route('donate') }}" wire:navigate
                     class="block text-center text-white/60 hover:text-white text-sm">← Back to donation</a>
-            </form>
+            </div>
         </div>
     </div>
 

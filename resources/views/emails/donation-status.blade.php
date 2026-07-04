@@ -7,7 +7,7 @@ Dear {{ $donation->donor_name }},
 
 @component('mail::panel')
 **Reference:** {{ $donation->reference }}
-**Amount:** ${{ number_format((float) $donation->amount, 2) }}
+**Amount:** Rp {{ number_format((float) $donation->amount, 0, ',', '.') }}
 **Frequency:** {{ $donation->time_range_label }}
 **Status:** {{ ucfirst($donation->status) }}
 @endcomponent
@@ -15,6 +15,10 @@ Dear {{ $donation->donor_name }},
 @if ($donation->status === \App\Models\Donation::STATUS_FAILED)
 @component('mail::button', ['url' => url('/donate')])
 Try Again
+@endcomponent
+@else
+@component('mail::button', ['url' => $receiptUrl])
+View Receipt
 @endcomponent
 @endif
 

@@ -11,17 +11,17 @@ use Livewire\Component;
 #[Title('Thank You — Grace Community Church')]
 class ThankYou extends Component
 {
-    public ?Donation $donation = null;
+    public Donation $donation;
 
-    public function mount()
+    /**
+     * Route-bound by `reference` and gated by the `signed` route middleware
+     * (see routes/web.php), rather than session state — this page is reached
+     * both via DOKU's redirect-back from an external domain and via a link
+     * in the confirmation email, neither of which reliably carries session.
+     */
+    public function mount(Donation $donation): void
     {
-        $ref = session('last_donation_ref');
-
-        if (! $ref) {
-            return $this->redirect(route('donate'), navigate: true);
-        }
-
-        $this->donation = Donation::where('reference', $ref)->first();
+        $this->donation = $donation;
     }
 
     public function render()

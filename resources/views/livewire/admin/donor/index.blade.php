@@ -42,7 +42,7 @@
                             <td class="text-gray-500">{{ $donor->donor_email }}</td>
                             <td class="text-gray-500">{{ $donor->donor_phone ?? '—' }}</td>
                             <td><span class="badge badge-ghost">{{ $donor->donations_count }}</span></td>
-                            <td class="font-bold text-primary">${{ number_format((float) $donor->total_amount, 2) }}</td>
+                            <td class="font-bold text-primary">Rp {{ number_format((float) $donor->total_amount, 0, ',', '.') }}</td>
                             <td class="text-xs text-gray-500">
                                 {{ \Illuminate\Support\Carbon::parse($donor->last_donation)->format('d M Y') }}
                             </td>

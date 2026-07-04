@@ -46,11 +46,11 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         echo "Creating donation presets...\n";
 
-        $amounts = [25, 50, 100];
+        $amounts = [25000, 50000, 100000];
         foreach ($amounts as $i => $amount) {
             DonationSetting::create([
                 'type' => DonationSetting::TYPE_AMOUNT,
-                'label' => '$'.$amount,
+                'label' => 'Rp '.number_format($amount, 0, ',', '.'),
                 'value' => (string) $amount,
                 'is_active' => true,
                 'sort_order' => $i,

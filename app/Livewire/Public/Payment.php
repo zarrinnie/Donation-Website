@@ -2,8 +2,11 @@
 
 namespace App\Livewire\Public;
 
+use App\Actions\Doku\GenerateDokuPaymentAction;
 use App\Actions\Donation\CreateDonationAction;
 use App\DTOs\Donation\DonationData;
+use App\Exceptions\Doku\DokuRequestFailedException;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -18,15 +21,6 @@ class Payment extends Component
     /** @var array<string, mixed> */
     public array $intent = [];
 
-    // Mock gateway fields
-    public string $card_name = '';
-
-    public string $card_number = '';
-
-    public string $card_expiry = '';
-
-    public string $card_cvc = '';
-
     public function mount()
     {
         $this->intent = session('donation_intent', []);
@@ -35,31 +29,20 @@ class Payment extends Component
         if (empty($this->intent)) {
             return $this->redirect(route('donate'), navigate: true);
         }
-
-        $this->card_name = $this->intent['donor_name'] ?? '';
     }
 
-    protected function rules(): array
+    /**
+     * Create the pending donation, then generate a real DOKU hosted-checkout
+     * link on demand (never pre-generated) and send the donor there.
+     */
+    public function pay(CreateDonationAction $createDonation, GenerateDokuPaymentAction $generatePayment)
     {
-        return [
-            'card_name' => 'required|string|min:2',
-            'card_number' => 'required|string|min:12|max:23',
-            'card_expiry' => 'required|string|min:4|max:5',
-            'card_cvc' => 'required|string|min:3|max:4',
-        ];
-    }
-
-    public function pay(CreateDonationAction $action)
-    {
-        $this->validate();
-
         $intent = session('donation_intent');
         if (empty($intent)) {
             return $this->redirect(route('donate'), navigate: true);
         }
 
-        // Mock gateway: we never charge a real card — we just record the gift.
-        $donation = $action->execute(new DonationData(
+        $donation = $createDonation->execute(new DonationData(
             donor_name: $intent['donor_name'],
             donor_age: $intent['donor_age'] ?? null,
             donor_email: $intent['donor_email'],
@@ -69,13 +52,23 @@ class Payment extends Component
             time_range_days: $intent['time_range_days'] ?? null,
             is_custom_amount: (bool) ($intent['is_custom_amount'] ?? false),
             is_custom_range: (bool) ($intent['is_custom_range'] ?? false),
-            payment_method: 'card',
+            payment_method: 'doku',
         ));
 
-        session()->forget('donation_intent');
-        session()->put('last_donation_ref', $donation->reference);
+        try {
+            $donation = $generatePayment->execute($donation);
+        } catch (DokuRequestFailedException $e) {
+            Log::error('doku.generate_payment_failed', ['donation_id' => $donation->id, 'message' => $e->getMessage()]);
+            $this->error('We could not reach the payment provider — please try again shortly.');
 
-        return $this->redirect(route('donate.thank-you'), navigate: true);
+            return null;
+        }
+
+        session()->forget('donation_intent');
+
+        // External redirect (DOKU's own domain) — Livewire's SPA `navigate`
+        // is same-origin only, so this must be a plain full-page redirect.
+        return $this->redirect($donation->doku_payment_url);
     }
 
     public function render()

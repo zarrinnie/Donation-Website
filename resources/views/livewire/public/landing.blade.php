@@ -36,7 +36,7 @@
                 <div class="card-soft absolute -bottom-8 left-8 px-7 py-5">
                     <p class="text-sm text-slate-500">Total Donated</p>
                     <p class="text-3xl font-extrabold text-slate-900">
-                        ${{ number_format($totalDonated, 2) }}
+                        Rp {{ number_format($totalDonated, 0, ',', '.') }}
                         <span class="text-mint text-lg">▮▮▮</span>
                     </p>
                 </div>
@@ -75,7 +75,7 @@
         {{-- Stats strip --}}
         <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mt-16 text-center">
             <div class="card-soft py-8">
-                <p class="text-4xl font-extrabold text-mint">${{ number_format($totalDonated, 0) }}</p>
+                <p class="text-4xl font-extrabold text-mint">Rp {{ number_format($totalDonated, 0, ',', '.') }}</p>
                 <p class="text-slate-500 mt-1">Raised together</p>
             </div>
             <div class="card-soft py-8">

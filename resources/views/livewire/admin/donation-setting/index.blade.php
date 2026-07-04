@@ -25,7 +25,7 @@
                         <tr wire:key="amt-{{ $row->id }}">
                             <td>{{ $row->sort_order }}</td>
                             <td class="font-bold">{{ $row->label }}</td>
-                            <td>${{ $row->value }}</td>
+                            <td>Rp {{ number_format((float) $row->value, 0, ',', '.') }}</td>
                             <td>
                                 <span class="badge {{ $row->is_active ? 'badge-success text-white' : 'badge-ghost' }} badge-sm">
                                     {{ $row->is_active ? __('Yes') : __('No') }}
@@ -92,9 +92,9 @@
             ]" icon="o-tag" />
 
             <x-input label="{{ __('Label') }}" wire:model="label" icon="o-pencil"
-                hint="{{ __('e.g. \$50 or 1 Month') }}" />
+                hint="{{ __('e.g. Rp 50,000 or 1 Month') }}" />
 
-            <x-input label="{{ $type === 'amount' ? __('Amount (USD)') : __('Number of days') }}"
+            <x-input label="{{ $type === 'amount' ? __('Amount (IDR)') : __('Number of days') }}"
                 wire:model="value" type="number" icon="o-calculator" />
 
             <div class="grid grid-cols-2 gap-4 items-center">

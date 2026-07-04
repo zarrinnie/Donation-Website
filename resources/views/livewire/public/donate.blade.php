@@ -17,14 +17,14 @@
             <div>
                 <div class="flex items-baseline justify-between mb-5">
                     <h2 class="text-2xl font-bold">1. Choose an amount</h2>
-                    <span class="text-sm text-slate-400">USD</span>
+                    <span class="text-sm text-slate-400">IDR</span>
                 </div>
 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     @foreach ($amountOptions as $opt)
                         <button type="button" wire:click="selectAmount('{{ $opt['value'] }}')"
                             class="donate-tile {{ $amountChoice === $opt['value'] ? 'is-active' : '' }}">
-                            <span class="tile-title">${{ $opt['value'] }}</span>
+                            <span class="tile-title">Rp {{ number_format((float) $opt['value'], 0, ',', '.') }}</span>
                             <span class="tile-sub">one gift</span>
                         </button>
                     @endforeach
@@ -39,8 +39,8 @@
 
                 @if ($amountChoice === 'custom')
                     <div class="mt-5 max-w-xs">
-                        <label class="block text-sm font-medium mb-2">Enter custom amount ($)</label>
-                        <input type="number" min="1" step="0.01" wire:model="customAmount"
+                        <label class="block text-sm font-medium mb-2">Enter custom amount (Rp)</label>
+                        <input type="number" min="1" step="1" wire:model="customAmount"
                             placeholder="e.g. 75"
                             class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:border-mint">
                         @error('customAmount') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror

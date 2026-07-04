@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class Donation extends Model
 {
@@ -22,6 +24,10 @@ class Donation extends Model
         self::STATUS_FAILED,
     ];
 
+    public const STATUS_SOURCE_WEBHOOK = 'doku_webhook';
+
+    public const STATUS_SOURCE_ADMIN = 'admin_manual';
+
     protected $fillable = [
         'donor_name',
         'donor_age',
@@ -36,6 +42,13 @@ class Donation extends Model
         'payment_method',
         'reference',
         'reminder_sent_at',
+        'subscription_id',
+        'doku_invoice_number',
+        'doku_payment_url',
+        'doku_response_payload',
+        'doku_webhook_payload',
+        'paid_at',
+        'status_source',
     ];
 
     protected $casts = [
@@ -45,7 +58,21 @@ class Donation extends Model
         'is_custom_amount' => 'boolean',
         'is_custom_range' => 'boolean',
         'reminder_sent_at' => 'datetime',
+        'doku_response_payload' => 'array',
+        'doku_webhook_payload' => 'array',
+        'paid_at' => 'datetime',
     ];
+
+    /** Generate the permanent, donor-facing donation reference. */
+    public static function generateReference(): string
+    {
+        return 'GCC-'.strtoupper(Str::random(10));
+    }
+
+    public function subscription(): BelongsTo
+    {
+        return $this->belongsTo(DonationSubscription::class, 'subscription_id');
+    }
 
     /** Latest donations first (overview default). */
     public function scopeLatestFirst(Builder $query): Builder

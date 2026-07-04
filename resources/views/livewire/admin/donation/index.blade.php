@@ -46,8 +46,13 @@
                                 <div class="font-bold">{{ $donation->donor_name }}</div>
                                 <div class="text-xs text-gray-500">{{ $donation->donor_email }}</div>
                             </td>
-                            <td class="font-bold">${{ number_format((float) $donation->amount, 2) }}</td>
-                            <td>{{ $donation->time_range_label }}</td>
+                            <td class="font-bold">Rp {{ number_format((float) $donation->amount, 0, ',', '.') }}</td>
+                            <td>
+                                {{ $donation->time_range_label }}
+                                @if ($donation->subscription_id)
+                                    <span class="badge badge-info badge-xs text-white ml-1">{{ __('Recurring') }}</span>
+                                @endif
+                            </td>
                             <td class="text-xs text-gray-500">{{ $donation->created_at->format('d M Y') }}</td>
 
                             {{-- STATUS SELECT --}}

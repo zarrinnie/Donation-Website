@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\URL;
 
 class DonationStatusMail extends Mailable
 {
@@ -46,12 +47,22 @@ class DonationStatusMail extends Mailable
 
         $copy = $messages[$this->donation->status] ?? $messages[Donation::STATUS_PENDING];
 
+        // A long-lived signed link to this donation's receipt — reuses the
+        // same Thank You page DOKU redirects to, just with a longer expiry
+        // suited to an email a donor might open weeks later.
+        $receiptUrl = URL::temporarySignedRoute(
+            'donate.thank-you',
+            now()->addDays(30),
+            ['donation' => $this->donation->reference],
+        );
+
         return new Content(
             markdown: 'emails.donation-status',
             with: [
                 'donation' => $this->donation,
                 'heading' => $copy['heading'],
                 'body' => $copy['body'],
+                'receiptUrl' => $receiptUrl,
             ],
         );
     }

@@ -4,15 +4,17 @@ namespace App\Actions\Donation;
 
 use App\DTOs\Donation\DonationData;
 use App\Models\Donation;
-use Illuminate\Support\Str;
 
 class CreateDonationAction
 {
     /**
      * Persist a new donation from the public checkout. Donations start
-     * in the `pending` state until an admin reviews them.
+     * in the `pending` state until an admin reviews them (or, for DOKU
+     * checkouts, until the payment webhook confirms them). Passing a
+     * $subscriptionId links this charge back to the recurring plan it
+     * renews (omit for a donor's first-ever gift).
      */
-    public function execute(DonationData $data): Donation
+    public function execute(DonationData $data, ?int $subscriptionId = null): Donation
     {
         return Donation::create([
             'donor_name' => $data->donor_name,
@@ -26,7 +28,8 @@ class CreateDonationAction
             'is_custom_range' => $data->is_custom_range,
             'status' => Donation::STATUS_PENDING,
             'payment_method' => $data->payment_method,
-            'reference' => 'GCC-'.strtoupper(Str::random(10)),
+            'reference' => Donation::generateReference(),
+            'subscription_id' => $subscriptionId,
         ]);
     }
 }

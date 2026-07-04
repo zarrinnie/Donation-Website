@@ -9,7 +9,7 @@
 
     {{-- STAT CARDS --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <x-stat title="{{ __('Total Raised') }}" value="${{ number_format($totalRaised, 2) }}"
+        <x-stat title="{{ __('Total Raised') }}" value="Rp {{ number_format($totalRaised, 0, ',', '.') }}"
             icon="o-banknotes" color="text-primary" />
         <x-stat title="{{ __('Successful') }}" value="{{ $countSuccessful }}" icon="o-check-circle"
             color="text-success" />
@@ -43,7 +43,7 @@
                                 <div class="font-bold">{{ $donation->donor_name }}</div>
                                 <div class="text-xs text-gray-500">{{ $donation->donor_email }}</div>
                             </td>
-                            <td class="font-bold">${{ number_format((float) $donation->amount, 2) }}</td>
+                            <td class="font-bold">Rp {{ number_format((float) $donation->amount, 0, ',', '.') }}</td>
                             <td>{{ $donation->time_range_label }}</td>
                             <td>
                                 <span class="badge {{ $donation->statusColor() }} text-white badge-sm">

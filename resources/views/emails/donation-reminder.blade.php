@@ -8,7 +8,7 @@ A little while ago you supported {{ config('app.name') }} with a **{{ $donation-
 If you'd like to continue giving, it only takes a moment to set up your next gift.
 
 @component('mail::panel')
-**Your previous gift:** ${{ number_format((float) $donation->amount, 2) }}
+**Your previous gift:** Rp {{ number_format((float) $donation->amount, 0, ',', '.') }}
 **Frequency:** {{ $donation->time_range_label }}
 **Reference:** {{ $donation->reference }}
 @endcomponent

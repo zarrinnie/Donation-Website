@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Doku\DokuClient;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Date;
@@ -16,7 +17,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(DokuClient::class, fn () => new DokuClient(
+            clientId: (string) config('services.doku.client_id'),
+            secretKey: (string) config('services.doku.secret_key'),
+            baseUrl: (string) config('services.doku.base_url'),
+        ));
     }
 
     /**
