@@ -42,14 +42,14 @@
                                 <div class="font-bold text-sm">{{ $donation->donor_name }}</div>
                                 <div class="text-xs opacity-60">{{ $donation->donor_email }}</div>
                                 <div class="text-xs opacity-60 font-mono mt-0.5">
-                                    {{ $donation->reference }} · {{ number_format($donation->amount, 2) }}
+                                    {{ $donation->reference }} · Rp {{ number_format((float) $donation->amount, 0, ',', '.') }}
                                     <span class="badge badge-xs {{ $donation->statusColor() }} align-middle">{{ $donation->status }}</span>
                                 </div>
                             </div>
                         </div>
                         {{-- BUTTON DETAIL --}}
                         <x-button icon="o-eye" class="btn-xs btn-square btn-ghost text-primary"
-                            link="{{ route('admin.donations') }}" tooltip="Open donations ledger" />
+                            link="{{ route('admin.donations.show', $donation) }}" tooltip="View donation" />
                     </div>
                 @empty
                     <div class="text-xs opacity-50 italic py-2">No donations found.</div>
@@ -57,7 +57,44 @@
             </div>
 
             {{-- ========================================================= --}}
-            {{-- 2. USERS SECTION                                          --}}
+            {{-- 2. DONORS SECTION                                         --}}
+            {{-- ========================================================= --}}
+            <div class="space-y-4">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h2 class="font-bold flex items-center gap-2">
+                        <x-icon name="o-user-group" class="w-5 h-5 text-primary" /> Donors ({{ $donors->count() }})
+                    </h2>
+                </div>
+
+                @forelse($donors as $donor)
+                    <div
+                        class="flex items-center justify-between p-3 bg-base-100 rounded-lg border border-base-200 hover:border-primary transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                                style="background-color:#52b788;">
+                                {{ strtoupper(substr($donor->donor_name, 0, 1)) }}
+                            </div>
+                            <div>
+                                <div class="font-bold text-sm">{{ $donor->donor_name }}</div>
+                                <div class="text-xs opacity-60">{{ $donor->donor_email }}</div>
+                                <div class="text-xs opacity-60 mt-0.5">
+                                    {{ $donor->donations_count }} gifts · Rp
+                                    {{ number_format((float) $donor->total_amount, 0, ',', '.') }}
+                                </div>
+                            </div>
+                        </div>
+                        {{-- BUTTON DETAIL --}}
+                        <x-button icon="o-eye" class="btn-xs btn-square btn-ghost text-primary"
+                            link="{{ route('admin.donors.show', ['email' => $donor->donor_email]) }}"
+                            tooltip="View donor" />
+                    </div>
+                @empty
+                    <div class="text-xs opacity-50 italic py-2">No donors found.</div>
+                @endforelse
+            </div>
+
+            {{-- ========================================================= --}}
+            {{-- 3. USERS SECTION                                          --}}
             {{-- ========================================================= --}}
             <div class="space-y-4">
                 <div class="flex justify-between items-center border-b pb-2">

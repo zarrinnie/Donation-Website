@@ -16,5 +16,9 @@ class SendDonationStatusEmailAction
     public function execute(Donation $donation): void
     {
         Mail::to($donation->donor_email)->send(new DonationStatusMail($donation));
+
+        // Record that the donor has been emailed so admins can see delivery
+        // state on the ledger / donation detail page.
+        $donation->forceFill(['status_email_sent_at' => now()])->save();
     }
 }

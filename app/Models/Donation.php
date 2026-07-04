@@ -49,6 +49,8 @@ class Donation extends Model
         'doku_webhook_payload',
         'paid_at',
         'status_source',
+        'admin_seen_at',
+        'status_email_sent_at',
     ];
 
     protected $casts = [
@@ -61,6 +63,8 @@ class Donation extends Model
         'doku_response_payload' => 'array',
         'doku_webhook_payload' => 'array',
         'paid_at' => 'datetime',
+        'admin_seen_at' => 'datetime',
+        'status_email_sent_at' => 'datetime',
     ];
 
     /** Generate the permanent, donor-facing donation reference. */
@@ -83,6 +87,15 @@ class Donation extends Model
     public function scopeSuccessful(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_SUCCESSFUL);
+    }
+
+    /**
+     * A "newly received" donation: successfully paid but not yet opened by an
+     * admin. Drives the NEW marker in the ledger and dashboard.
+     */
+    public function isNewForAdmin(): bool
+    {
+        return $this->status === self::STATUS_SUCCESSFUL && $this->admin_seen_at === null;
     }
 
     /** DaisyUI badge colour for the current status. */

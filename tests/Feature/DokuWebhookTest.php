@@ -52,7 +52,7 @@ it('processes a validly signed successful payment notification and enrolls a sub
         'order' => ['invoice_number' => 'INV-1', 'amount' => (int) $donation->amount],
         'transaction' => ['status' => 'SUCCESS', 'date' => now()->toIso8601String()],
     ];
-    $headers = dokuWebhookHeaders(json_encode($payload), '/webhooks/doku/notification', 'test-client', 'test-secret');
+    $headers = dokuWebhookHeaders(json_encode($payload), '/api/webhooks/doku/notification', 'test-client', 'test-secret');
 
     postDokuWebhook($payload, $headers)->assertOk();
 
@@ -69,7 +69,7 @@ it('rejects a notification with a tampered signature', function () {
     $donation = Donation::factory()->status('pending')->create(['doku_invoice_number' => 'INV-2']);
 
     $payload = ['order' => ['invoice_number' => 'INV-2', 'amount' => 1], 'transaction' => ['status' => 'SUCCESS']];
-    $headers = dokuWebhookHeaders(json_encode($payload), '/webhooks/doku/notification', 'test-client', 'test-secret');
+    $headers = dokuWebhookHeaders(json_encode($payload), '/api/webhooks/doku/notification', 'test-client', 'test-secret');
     $headers['Signature'] = 'HMACSHA256=invalidinvalidinvalid';
 
     postDokuWebhook($payload, $headers)->assertUnauthorized();
@@ -86,7 +86,7 @@ it('rejects a notification with a stale timestamp', function () {
     $requestId = (string) Str::uuid();
     $staleTimestamp = now()->subMinutes(10)->utc()->format('Y-m-d\TH:i:s\Z');
     $digest = DokuSignature::digest($rawBody);
-    $canonical = DokuSignature::canonicalString('test-client', $requestId, $staleTimestamp, '/webhooks/doku/notification', $digest);
+    $canonical = DokuSignature::canonicalString('test-client', $requestId, $staleTimestamp, '/api/webhooks/doku/notification', $digest);
     $signature = DokuSignature::sign('test-secret', $canonical);
 
     $headers = [
@@ -110,7 +110,7 @@ it('safely ignores a duplicate notification for an already-processed donation', 
         'order' => ['invoice_number' => 'INV-4', 'amount' => (int) $donation->amount],
         'transaction' => ['status' => 'SUCCESS', 'date' => now()->toIso8601String()],
     ];
-    $headers = dokuWebhookHeaders(json_encode($payload), '/webhooks/doku/notification', 'test-client', 'test-secret');
+    $headers = dokuWebhookHeaders(json_encode($payload), '/api/webhooks/doku/notification', 'test-client', 'test-secret');
 
     postDokuWebhook($payload, $headers)->assertOk();
 

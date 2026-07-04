@@ -8,6 +8,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         channels: __DIR__.'/../routes/channels.php',
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -19,13 +20,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\SetTimezone::class, // <-- Tambahkan ini
-        ]);
-
-        // DOKU's server-to-server webhook has no session/CSRF token —
-        // authenticity is instead enforced via HMAC signature verification
-        // inside DokuWebhookController.
-        $middleware->validateCsrfTokens(except: [
-            'webhooks/doku/notification',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

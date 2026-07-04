@@ -35,7 +35,25 @@ class GlobalSearch extends Component
                 ->get();
         }
 
-        // 2. Admin users (name / email), optionally filtered by role.
+        // 2. Donors — unique givers (grouped by email) matching the term, with
+        //    aggregated totals. Mirrors the Admin\Donor\Index directory query.
+        $donors = collect();
+        if ($term) {
+            $donors = Donation::query()
+                ->selectRaw('donor_email,
+                    MAX(donor_name) as donor_name,
+                    COUNT(*) as donations_count,
+                    SUM(amount) as total_amount,
+                    MAX(created_at) as last_donation')
+                ->where(fn ($q) => $q->where('donor_name', 'like', "%$term%")
+                    ->orWhere('donor_email', 'like', "%$term%"))
+                ->groupBy('donor_email')
+                ->orderByDesc('last_donation')
+                ->limit(10)
+                ->get();
+        }
+
+        // 3. Admin users (name / email), optionally filtered by role.
         $users = collect();
         if ($term) {
             $users = User::query()
@@ -48,6 +66,7 @@ class GlobalSearch extends Component
 
         return view('livewire.admin.global-search', [
             'donations' => $donations,
+            'donors' => $donors,
             'users' => $users,
         ]);
     }

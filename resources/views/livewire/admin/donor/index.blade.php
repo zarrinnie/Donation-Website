@@ -24,19 +24,21 @@
                         <th>{{ __('Gifts') }}</th>
                         <th>{{ __('Total Given') }}</th>
                         <th>{{ __('Last Donation') }}</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($donors as $donor)
                         <tr wire:key="donor-{{ $donor->donor_email }}">
                             <td>
-                                <div class="flex items-center gap-3">
+                                <a href="{{ route('admin.donors.show', ['email' => $donor->donor_email]) }}"
+                                    class="flex items-center gap-3 hover:opacity-80">
                                     <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold"
                                         style="background-color:#52b788;">
                                         {{ strtoupper(substr($donor->donor_name, 0, 1)) }}
                                     </div>
-                                    <span class="font-bold">{{ $donor->donor_name }}</span>
-                                </div>
+                                    <span class="font-bold link link-hover">{{ $donor->donor_name }}</span>
+                                </a>
                             </td>
                             <td>{{ $donor->donor_age ?? '—' }}</td>
                             <td class="text-gray-500">{{ $donor->donor_email }}</td>
@@ -46,10 +48,15 @@
                             <td class="text-xs text-gray-500">
                                 {{ \Illuminate\Support\Carbon::parse($donor->last_donation)->format('d M Y') }}
                             </td>
+                            <td class="text-right">
+                                <x-button icon="o-eye"
+                                    link="{{ route('admin.donors.show', ['email' => $donor->donor_email]) }}"
+                                    class="btn-ghost btn-xs" tooltip="{{ __('View donor') }}" />
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center py-10 text-gray-500">{{ __('No donors yet.') }}</td>
+                            <td colspan="8" class="text-center py-10 text-gray-500">{{ __('No donors yet.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

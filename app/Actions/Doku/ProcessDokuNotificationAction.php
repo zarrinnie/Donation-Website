@@ -2,6 +2,7 @@
 
 namespace App\Actions\Doku;
 
+use App\Actions\Donation\NotifyAdminsOfDonationAction;
 use App\Actions\Donation\SendDonationStatusEmailAction;
 use App\Actions\Donation\UpdateDonationStatusAction;
 use App\Actions\Subscription\EnrollOrRenewSubscriptionAction;
@@ -16,6 +17,7 @@ class ProcessDokuNotificationAction
         private readonly UpdateDonationStatusAction $updateStatus,
         private readonly EnrollOrRenewSubscriptionAction $enrollOrRenew,
         private readonly SendDonationStatusEmailAction $sendStatusEmail,
+        private readonly NotifyAdminsOfDonationAction $notifyAdmins,
     ) {}
 
     /**
@@ -56,6 +58,8 @@ class ProcessDokuNotificationAction
                 amount: (float) $donation->amount,
                 sourceDonationId: $donation->id,
             ));
+
+            $this->notifyAdmins->execute($donation);
         }
 
         $this->sendStatusEmail->execute($donation);

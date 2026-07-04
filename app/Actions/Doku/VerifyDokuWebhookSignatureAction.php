@@ -22,30 +22,40 @@ class VerifyDokuWebhookSignatureAction
         $clientId = $request->header('Client-Id');
         $requestId = $request->header('Request-Id');
         $requestTimestamp = $request->header('Request-Timestamp');
-        $digestHeader = $request->header('Digest');
         $signatureHeader = $request->header('Signature');
 
-        if (! $clientId || ! $requestId || ! $requestTimestamp || ! $digestHeader || ! $signatureHeader) {
-            throw new InvalidDokuSignatureException('Missing one or more required DOKU signature headers.');
+        // DOKU's HTTP notification sends Client-Id, Request-Id,
+        // Request-Timestamp and Signature — but NOT a Digest header. The digest
+        // is computed by the receiver from the raw body and folded into the
+        // signed component string. (Requiring a Digest header here caused every
+        // real notification to be rejected with 401 "missing headers".)
+        if (! $clientId || ! $requestId || ! $requestTimestamp || ! $signatureHeader) {
+            $present = array_keys(array_filter([
+                'Client-Id' => $clientId,
+                'Request-Id' => $requestId,
+                'Request-Timestamp' => $requestTimestamp,
+                'Signature' => $signatureHeader,
+            ]));
+
+            throw new InvalidDokuSignatureException(
+                'Missing one or more required DOKU signature headers (present: '.(implode(', ', $present) ?: 'none').').'
+            );
         }
 
         if (! DokuSignature::matches((string) config('services.doku.client_id'), $clientId)) {
             throw new InvalidDokuSignatureException('Client-Id header does not match the configured DOKU client.');
         }
 
-        $rawBody = $request->getContent();
-        $expectedDigest = DokuSignature::digest($rawBody);
-
-        if (! DokuSignature::matches($expectedDigest, $digestHeader)) {
-            throw new InvalidDokuSignatureException('Digest header does not match the request body.');
-        }
+        // Recompute the digest from the exact bytes DOKU sent, then rebuild the
+        // canonical string DOKU signed over.
+        $digest = DokuSignature::digest($request->getContent());
 
         $canonicalString = DokuSignature::canonicalString(
             $clientId,
             $requestId,
             $requestTimestamp,
             '/'.$request->path(),
-            $digestHeader,
+            $digest,
         );
         $expectedSignature = DokuSignature::sign((string) config('services.doku.webhook_secret'), $canonicalString);
 

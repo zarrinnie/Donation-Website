@@ -38,7 +38,13 @@
                 <tbody>
                     @forelse ($donations as $donation)
                         <tr wire:key="dash-{{ $donation->id }}">
-                            <td class="font-mono text-xs">{{ $donation->reference }}</td>
+                            <td class="font-mono text-xs">
+                                <a href="{{ route('admin.donations.show', $donation) }}"
+                                    class="link link-hover">{{ $donation->reference }}</a>
+                                @if ($donation->isNewForAdmin())
+                                    <span class="badge badge-success badge-xs text-white ml-1">{{ __('NEW') }}</span>
+                                @endif
+                            </td>
                             <td>
                                 <div class="font-bold">{{ $donation->donor_name }}</div>
                                 <div class="text-xs text-gray-500">{{ $donation->donor_email }}</div>

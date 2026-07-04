@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\DokuWebhookController;
 // Auth Routes
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\Donation\Index as AdminDonationIndex;
+use App\Livewire\Admin\Donation\Show as AdminDonationShow;
 use App\Livewire\Admin\DonationSetting\Index as AdminDonationSettingIndex;
 use App\Livewire\Admin\Donor\Index as AdminDonorIndex;
+use App\Livewire\Admin\Donor\Show as AdminDonorShow;
 // Email Verification Routes
 use App\Livewire\Admin\GlobalSearch;
 // Route khusus untuk handle klik link dari email (Laravel Handle Otomatis)
@@ -42,12 +43,6 @@ Route::get('/donate/thank-you/{donation:reference}', ThankYou::class)
 // Signed: reached only via the monthly renewal reminder email.
 Route::get('/donate/subscription/{subscription}/review', SubscriptionReview::class)
     ->middleware('signed')->name('donate.subscription.review');
-
-// Server-to-server DOKU payment notification — no session/CSRF (see
-// bootstrap/app.php's validateCsrfTokens except-list), verified via HMAC
-// signature inside the controller itself.
-Route::post('/webhooks/doku/notification', DokuWebhookController::class)
-    ->name('webhooks.doku.notification');
 
 // Route khusus untuk halaman "Please Verify"
 Route::get('/email/verify', VerifyEmail::class)
@@ -90,8 +85,10 @@ Route::middleware(['auth', 'role:super_admin|admin'])->prefix('admin')->name('ad
 
     Route::get('/dashboard', AdminDashboard::class)->name('dashboard');              // Latest Donations overview
     Route::get('/donations', AdminDonationIndex::class)->name('donations');          // Detailed ledger + status
+    Route::get('/donations/{donation}', AdminDonationShow::class)->name('donations.show'); // Single donation detail
     Route::get('/donation-settings', AdminDonationSettingIndex::class)->name('donation-settings');
     Route::get('/donors', AdminDonorIndex::class)->name('donors');                   // Unique donor directory
+    Route::get('/donors/{email}', AdminDonorShow::class)->where('email', '.*')->name('donors.show'); // Donor detail by email
 });
 
 // ============ ADMIN (super_admin only) ============
